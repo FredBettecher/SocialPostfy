@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, MaxLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength } from "class-validator";
 
 export class SignInDTO {
   @IsString()
@@ -8,7 +8,6 @@ export class SignInDTO {
 
   @IsString()
   @IsNotEmpty()
-  @IsStrongPassword({ minLength: 6 })
-  @MaxLength(20)
+  @MinLength(6)
   password: string;
 }

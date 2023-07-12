@@ -1,41 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
-import { SignInDTO } from './dto/signin.dto';
-import { PrismaService } from 'src/prisma.service';
+import { UserRepository } from './repository/user.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findUser(email: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+    const user = await this.userRepository.findUser(email);
+    if(!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user;
   }
 
   async createUser(data: UserDTO) {
-    const emailInUse = await this.findUser(data.email);
+    const emailInUse = await this.userRepository.findUser(data.email);
     if(emailInUse) throw new HttpException('Email already in use', HttpStatus.CONFLICT);
 
-    return await this.prisma.user.create({
-      data: data,
-    });
+    const hashPassword = bcrypt.hashSync(data.password, 10);
+    await this.userRepository.createUser({ ...data, password: hashPassword });
   }
-  
-  // createUser({ name, email, password, avatar }: UserDTO) {
-  //   const emailInUse = this.users.find(item => item.email === email);
-  //   if(emailInUse) throw new HttpException('Email already in use', HttpStatus.CONFLICT);
-
-  //   const user = new User(name, email, password, avatar);
-    
-  //   return this.users.push(user); 
-  // }
-
-  // signIn({ email, password }: SignInDTO) {
-  //   const checkEmail = this.users.find(item => item.email === email);
-  //   const checkPassword = this.users.find(item => item.password === password);
-  //   if(!checkEmail || !checkPassword) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-  // }
 }
