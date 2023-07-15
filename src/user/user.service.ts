@@ -13,6 +13,12 @@ export class UserService {
     return user;
   }
 
+  async findUserById(id: string) {
+    const user = await this.userRepository.findUserById(id);
+    if(!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user;
+  }
+
   async createUser(data: UserDTO) {
     const emailInUse = await this.userRepository.findUser(data.email);
     if(emailInUse) throw new HttpException('Email already in use', HttpStatus.CONFLICT);
