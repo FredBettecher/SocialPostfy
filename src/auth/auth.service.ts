@@ -1,10 +1,11 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SignInDTO } from './dto/signIn.dto';
 import { SignUpDTO } from './dto/signUp.dto';
-import { UserRepository } from 'src/user/repository/user.repository';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
+import { UserRepository } from 'src/user/repository/user.repository';
 
 @Injectable()
 export class AuthService {
@@ -13,12 +14,13 @@ export class AuthService {
   private AUDIENCE = 'user';
 
   constructor(
+    private readonly userService: UserService,
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService
     ) {}
 
-  async signIn({email, password}: SignInDTO) {
-    const user = await this.userRepository.findUser(email);
+  async signIn({ email, password }: SignInDTO) {
+    const user = await this.userService.findUser(email);
     if(!user) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
 
     const validPassword = bcrypt.compareSync(password, user.password);
@@ -31,7 +33,7 @@ export class AuthService {
     const emailInUse = await this.userRepository.findUser(body.email);
     if(emailInUse) throw new HttpException('E-mail already in use', HttpStatus.CONFLICT);
 
-    const user = await this.userRepository.createUser(body);
+    const user = await this.userService.createUser(body);
     return this.createToken(user);
   }
   

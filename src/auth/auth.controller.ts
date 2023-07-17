@@ -3,11 +3,11 @@ import { SignUpDTO } from './dto/signUp.dto';
 import { AuthService } from './auth.service';
 import { SignInDTO } from './dto/signIn.dto';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
+  @Post('user')
   signUp(@Body() body: SignUpDTO) {
     return this.authService.signUp(body);
   }

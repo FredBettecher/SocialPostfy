@@ -9,27 +9,27 @@ datasource db {
 
 model Publication {
   id            String   @id @default(uuid())
-  userId        String?  @db.VarChar(255)
+  userId        String  @db.VarChar(255)
   image         String   @db.VarChar(255)
   title         String   @db.VarChar(50)
   text          String
-  dateToPublish DateTime @db.Timestamptz(6)
+  dateToPublish String   @db.VarChar(10)
   published     Boolean? @default(false)
   socialMedia   String   @db.VarChar(50)
-  createdAt     DateTime @db.Timestamptz(6) @default(now())
-  users         User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  users         User?    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("publications")
 }
 
 model User {
-  id           String         @id @default(uuid())
-  name         String         @db.VarChar(100)
-  email        String         @unique @db.VarChar(100)
-  password     String         @db.VarChar(20)
-  avatar       String         @db.VarChar(255)
-  createdAt    DateTime       @db.Timestamptz(6) @default(now())
+  id           String        @id @default(uuid())
+  name         String        @db.VarChar(100)
+  email        String        @unique @db.VarChar(100)
+  password     String        @db.VarChar(100)
+  avatar       String        @db.VarChar(255)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   publications Publication[]
-  
+
   @@map("users")
 }

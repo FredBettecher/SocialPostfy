@@ -24,6 +24,7 @@ export class UserService {
     if(emailInUse) throw new HttpException('Email already in use', HttpStatus.CONFLICT);
 
     const hashPassword = bcrypt.hashSync(data.password, 10);
-    await this.userRepository.createUser({ ...data, password: hashPassword });
+    const user = await this.userRepository.createUser({ ...data, password: hashPassword });
+    return user;
   }
 }
